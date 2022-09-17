@@ -1,3 +1,5 @@
+TranReloc incl R/
+.Rhistory
 target/
 pom.xml.tag
 pom.xml.releaseBackup
