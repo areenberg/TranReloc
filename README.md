@@ -39,7 +39,7 @@ Customers arriving to an asset without idle servers can be relocated to an alter
 
 As they relocate to the alternative asset, the relocated customers must be assigned a service-time distribution. The following governs the assignment process: (1) The customer's preferred asset (the one currently in shortage), and (2) a probability distribution. For instance, say customers are relocated from *Asset 0* to *Asset 1*, and *Asset 1* contains three types of service-time distributions. The service-time of the relocated customers are governed by the first distribution with a probability of 25%, the second distribution with a probability of 10%, and the third distribution with a probability of 65%.         
 
-The first service-time distribution (index 0) *always* governs the service-time of customers succeeding in receiving service from the preferred asset. 
+The first service-time distribution (index 0) *always* governs the service-time of the customers that are not relocated. However, note that this service-time distribution can also be used by the relocated customers. 
 
 <img src="https://github.com/areenberg/TranReloc/blob/main/Images/Relocation.jpg?raw=true" width="1400" height="550">
 
