@@ -31,7 +31,7 @@ Consider a discretized timeline consisting of n consecutive segments. The algori
 The system contains a range of queues, denoted *assets*. Additionally, each asset is subject to a capacity, arrival intensity and range of service-time distributions. All service-times are governed by phase-type (PH) distributions. The number of assets and service distributions are fixed, but the capacity, arrival intensity and configurations of the distributions (i.e. the number of phases and parameter values) are allowed to change over time. That is, between the consecutive segments.  
 
 
-<img src="https://github.com/areenberg/TranReloc/blob/main/Images/Parameters1.jpg?raw=true" width="1400" height="550">
+<img src="https://github.com/areenberg/TranReloc/blob/main/Images/Parameters1.jpg?raw=true" width="1400" height="350">
 
 ## Relocation of customers
 
