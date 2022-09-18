@@ -23,7 +23,7 @@ TranReloc is written in Java, and the interface currently consists of a simple C
 TranReloc use a Continuous-Time Markov Chain (CTMC) and a numerical approach to model the system.
 Consider a discretized timeline consisting of n consecutive segments. The algorithm in TranReloc use uniformization to evaluate the transient solution to the CTMC by assuming time-homogenuous (i.e. fixed) parameters within each segment. As the algorithm change segment, so does the parameters. Thus, the accuracy of the solution to the state probabilities can be controlled by adjusting the size of the segments.
 
-<img src="https://github.com/areenberg/TranReloc/blob/master/Images/TimeLine.jpeg" width="430" height="500">
+<img src="https://github.com/areenberg/TranReloc/blob/main/Images/TimeLine.jpg?raw=true" width="430" height="500">
 
 
 ## Structure of parameters
@@ -31,7 +31,7 @@ Consider a discretized timeline consisting of n consecutive segments. The algori
 The system contains a range of queues, denoted *assets*. Additionally, each asset is subject to a capacity, arrival intensity and range of service-time distributions. All service-times are governed by phase-type (PH) distributions. The number of assets and service distributions are fixed, but the capacity, arrival intensity and configurations of the distributions (i.e. the number of phases and parameter values) are allowed to change over time. That is, between the consecutive segments.  
 
 
-<img src="https://raw.githubusercontent.com/areenberg/TranReloc/main/Images/Parameters.jpg" width="430" height="500">
+<img src="https://github.com/areenberg/TranReloc/blob/main/Images/Parameters.jpg?raw=true" width="430" height="500">
 
 ## Relocation of customers
 
