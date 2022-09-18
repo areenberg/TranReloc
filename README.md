@@ -41,7 +41,7 @@ As they relocate to the alternative asset, the relocated customers must be assig
 
 The first service-time distribution (index 0) *always* governs the service-time of customers succeeding in receiving service from the preferred asset. 
 
-<img src="https://github.com/areenberg/TranReloc/blob/master/Images/Relocation.jpeg" width="430" height="500">
+<img src="https://github.com/areenberg/TranReloc/blob/main/Images/Relocation.jpg?raw=true" width="430" height="500">
 
 
  
