@@ -20,10 +20,22 @@ setwd(dirname(getActiveDocumentContext()$path))
 # FUNCTIONS
 #----------------------------
 
+cleanServiceTime <- function(){
+  unlink(paste(getwd(),"/Parameters/RentalTime",sep=""),recursive=TRUE)
+  dir.create(paste(getwd(),"/Parameters/RentalTime",sep=""))
+}
+
 serviceTimeDist <- function(initDist,phGen,timeIdx,distIdx,assetIdx){
   nPhases <- length(initDist)
-  dir <- paste("Parameters/RentalTime/time",timeIdx,"/asset",assetIdx,
-               "/distribution",distIdx,"/phases",sep="")
+  
+  #create directory
+  dir.create(paste(getwd(),"/Parameters/RentalTime/time",timeIdx,sep=""),showWarnings=FALSE)
+  dir.create(paste(getwd(),"/Parameters/RentalTime/time",timeIdx,"/asset",assetIdx,sep=""),showWarnings=FALSE)
+  dir.create(paste(getwd(),"/Parameters/RentalTime/time",timeIdx,"/asset",assetIdx,
+             "/distribution",distIdx,sep=""),showWarnings=FALSE)
+  
+  dir <- paste(paste(getwd(),"/Parameters/RentalTime/time",timeIdx,"/asset",assetIdx,
+                     "/distribution",distIdx,"/phases",sep=""))
   str <- paste(initDist[1],paste(phGen[1,],collapse=" "),collapse = "   ")
   cat(str,file=dir,sep="\n")
   
@@ -37,19 +49,20 @@ serviceTimeDist <- function(initDist,phGen,timeIdx,distIdx,assetIdx){
 }
 
 relocationRules <- function(rules){
-  cat(rules[1],file="Parameters/RelocationRules",sep="\n")
+  cat(rules[1],file=paste(getwd(),"/Parameters/RelocationRules",sep=""),sep="\n")
   if (length(rules)>1){
     for (i in 2:length(rules)){
-      cat(rules[i],file="Parameters/RelocationRules",append=TRUE,sep="\n")  
+      cat(rules[i],file=paste(getwd(),"/Parameters/RelocationRules",sep=""),append=TRUE,sep="\n")  
     }  
   }
 }
 
 numberOfAssets <- function(nAssets){
   
-  cat(nAssets,file="Parameters/NumberOfAssets",sep="")
+  cat(nAssets,file=paste(getwd(),"/Parameters/NumberOfAssets",sep=""),sep="")
   
 }
+
 
 
 #----------------------------
@@ -161,6 +174,7 @@ numberOfAssets(nAssets)
 
 relocationRules(relocRules)
 
+cleanServiceTime()
 for (timeIdx in c(0:(timePeriods-1))){
   #----- asset 0 distributions -----
   #distribution 0:
