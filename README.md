@@ -23,7 +23,7 @@ TranReloc is written in Java, and the interface currently consists of a simple C
 TranReloc use a Continuous-Time Markov Chain (CTMC) and a numerical approach to model the system.
 Consider a discretized timeline consisting of n consecutive segments. The algorithm in TranReloc use uniformization to evaluate the transient solution to the CTMC by assuming time-homogenuous (i.e. fixed) parameters within each segment. As the algorithm change segment, so does the parameters. Thus, the accuracy of the solution to the state probabilities can be controlled by adjusting the size of the segments.
 
-<img src="https://github.com/areenberg/TranReloc/blob/main/Images/TimeLine.jpg?raw=true" width="1400" height="400">
+<img src="https://github.com/areenberg/TranReloc/blob/main/Images/TimeLine.jpg?raw=true" width="1400" height="232">
 
 
 ## Structure of parameters
@@ -39,7 +39,7 @@ Customers arriving to an asset without idle servers can be relocated to an alter
 
 As they relocate to the alternative asset, the relocated customers must be assigned a service-time distribution. The following governs the assignment process: (1) The customer's preferred asset (the one currently in shortage), and (2) a probability distribution. For instance, say customers are relocated from *Asset 0* to *Asset 1*, and *Asset 1* contains three types of service-time distributions. The service-time of the relocated customers are governed by the first distribution with a probability of 25%, the second distribution with a probability of 10%, and the third distribution with a probability of 65%.         
 
-The first service-time distribution (index 0) *always* governs the service-time of customers succeeding in receiving service from the preferred asset. 
+The first service-time distribution (index 0) *always* governs the service-time of the customers that are not relocated. However, note that this service-time distribution can also be used by the relocated customers. 
 
 <img src="https://github.com/areenberg/TranReloc/blob/main/Images/Relocation.jpg?raw=true" width="1400" height="550">
 
