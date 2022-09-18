@@ -31,6 +31,7 @@ public class TranReloc {
         //-----------------------
         String task = getTask(args); //task to be conducted ("evaluate" or "optimize")
         String resDir = getResultsDirectory(args); //directory for results
+        String serLevel = getServiceLevel(args); //get the service level for the optimization procedure
         if (task.equals("none")){
             task = "evaluate"; //default task
         }
@@ -39,7 +40,12 @@ public class TranReloc {
         }
         
         //service level for the optimization procedure
-        double serviceLevel = 0.99;
+        double serviceLevel;
+        if (serLevel.equals("none")){
+            serviceLevel = 0.99; //default service level
+        }else{
+            serviceLevel = Double.parseDouble(serLevel);
+        }
         
         //-----------------------
         //read parameters
@@ -88,6 +94,25 @@ public class TranReloc {
             return("none");
         }else{
             return(inputArgs[(idx+1)]);
+        }
+        
+    }
+
+    public static String getServiceLevel(String[] inputArgs){
+        
+        int idx=0;
+        while (idx<inputArgs.length && !inputArgs[idx].equals("-s")){
+            idx++;
+        }
+        if (idx==inputArgs.length){
+            return("none");
+        }else{
+            if (Double.parseDouble(inputArgs[(idx+1)])>0.0&&
+                    Double.parseDouble(inputArgs[(idx+1)])<1.0){
+                return(inputArgs[(idx+1)]);
+            }else{
+                return("none");
+            }
         }
         
     }

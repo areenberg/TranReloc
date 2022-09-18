@@ -20,9 +20,13 @@ setwd(dirname(getActiveDocumentContext()$path))
 # FUNCTIONS
 #----------------------------
 
-cleanServiceTime <- function(){
+cleanUp <- function(){
   unlink(paste(getwd(),"/Parameters/RentalTime",sep=""),recursive=TRUE)
+  unlink(paste(getwd(),"/Parameters",sep=""),recursive=TRUE)
+  unlink(paste(getwd(),"/Results",sep=""),recursive=TRUE)
+  dir.create(paste(getwd(),"/Parameters",sep=""))
   dir.create(paste(getwd(),"/Parameters/RentalTime",sep=""))
+  dir.create(paste(getwd(),"/Results",sep=""))
 }
 
 serviceTimeDist <- function(initDist,phGen,timeIdx,distIdx,assetIdx){
@@ -170,11 +174,16 @@ asset1.dist1.phGen <- matrix(c(-3.0,2.0,
 # INSERT (SAVE) PARAMETERS
 #----------------------------
 
+#clean up a bit first
+cleanUp()
+
+#number of assets
 numberOfAssets(nAssets)
 
+#relocation rules
 relocationRules(relocRules)
 
-cleanServiceTime()
+#service time distributions
 for (timeIdx in c(0:(timePeriods-1))){
   #----- asset 0 distributions -----
   #distribution 0:
@@ -191,23 +200,22 @@ for (timeIdx in c(0:(timePeriods-1))){
   serviceTimeDist(asset1.dist1.initDist,asset1.dist1.phGen,timeIdx,1,1)
 }
 
-write.table(currentOccupied,file="Parameters/CurrentlyOccupied",sep=",",row.names=FALSE,quote=FALSE)
-write.table(assetDists,file="Parameters/NumberOfAssetDists",sep=",",row.names=FALSE,quote=FALSE)
-write.table(capacity,file="Parameters/Capacity",sep=",",row.names=FALSE,quote=FALSE)
-write.table(arrivalRate,file="Parameters/ArrivalRates",sep=",",row.names=FALSE,quote=FALSE)
-
+write.table(currentOccupied,file=paste(getwd(),"/Parameters/CurrentlyOccupied",sep=""),sep=",",row.names=FALSE,quote=FALSE)
+write.table(assetDists,file=paste(getwd(),"/Parameters/NumberOfAssetDists",sep=""),sep=",",row.names=FALSE,quote=FALSE)
+write.table(capacity,file=paste(getwd(),"/Parameters/Capacity",sep=""),sep=",",row.names=FALSE,quote=FALSE)
+write.table(arrivalRate,file=paste(getwd(),"/Parameters/ArrivalRates",sep=""),sep=",",row.names=FALSE,quote=FALSE)
 
 #----------------------------
 # RUN THE PROGRAM
 #----------------------------
 
-system(paste("java -jar TranReloc.jar","-t",task))
+system(paste("java -jar '",getwd(),"/TranReloc.jar'"," -t ",task,sep=""))
 
 #----------------------------
 # GET THE RESULTS
 #----------------------------
 
-results <- read.table("Results/results.csv",sep=",",header=TRUE)
+results <- read.table(paste(getwd(),"/Results/results.csv",sep=""),sep=",",header=TRUE)
 
 
 
