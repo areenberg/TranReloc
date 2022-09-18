@@ -1,7 +1,7 @@
 # TranReloc
 TranReloc evaluates queueing systems with customer relocation. Consider the M/PH/c/c queue, i.e. where customers have exponentially distributed inter-arrival time, phase-type distributed service time, and c servers. The capacity of the queue is equal to the number of servers, and customers will be rejected if they arrive when none of the c servers are idle at the time of arrival to the queue. TranReloc extends the M/PH/c/c queue by considering a series of systems that may relocate customers instead completely rejecting them. Moreover, TranReloc gives the user the opportunity to evaluate the system with time-dependent parameters. This type of system reflects customer behavior in the rental industry and patient flow in hospitals.
 
-TranReloc is written in Java, and the interface currently consists of a simple CLI and an R-script (see the section *Implementing your model (using R)*).
+TranReloc is written in Java, and the interface currently consists of a simple CLI and an R-script (see the section *"Implementing your model (using R)"*).
   
 ## Features
 
