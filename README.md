@@ -23,7 +23,7 @@ TranReloc is written in Java, and the interface currently consists of a simple C
 TranReloc use a Continuous-Time Markov Chain (CTMC) and a numerical approach to model the system.
 Consider a discretized timeline consisting of n consecutive segments. The algorithm in TranReloc use uniformization to evaluate the transient solution to the CTMC by assuming time-homogenuous (i.e. fixed) parameters within each segment. As the algorithm change segment, so does the parameters. Thus, the accuracy of the solution to the state probabilities can be controlled by adjusting the size of the segments.
 
-<img src="https://github.com/areenberg/TranReloc/blob/main/Images/TimeLine.jpg?raw=true" width="1400" height="400">
+<img src="https://github.com/areenberg/TranReloc/blob/main/Images/TimeLine.jpg?raw=true" width="900 height="232">
 
 
 ## Structure of parameters
