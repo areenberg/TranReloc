@@ -74,7 +74,7 @@ numberOfAssets <- function(nAssets){
 #----------------------------
 
 #task ("optimize" or "evaluate")
-task <- "optimize"
+task <- "evaluate"
  
 #number of assets
 nAssets <- 2
@@ -209,7 +209,7 @@ write.table(arrivalRate,file=paste(getwd(),"/Parameters/ArrivalRates",sep=""),se
 # RUN THE PROGRAM
 #----------------------------
 
-system(paste("java -jar '",getwd(),"/TranReloc.jar'"," -t ",task,sep=""))
+system(paste("java -jar \"",getwd(),"/TranReloc.jar\""," -t ",task,sep=""))
 
 #----------------------------
 # GET THE RESULTS
