@@ -29,15 +29,19 @@ import java.io.IOException;
 public class AggregatedResults {
 
     int[] timeSegment; //time
+    int nTimeSegments; //largest number of time segments
     double[] runtime; //time
     double[][] meanOccupancy; //time x asset
     double[][] blockingProbability; //time x asset
     double[][][] percentiles; //time x asset x percentile (0.01,0.025,0.25,0.5,0.75,0.975,0.99)
     double[][] capacity; //time x asset
+    MarginalDistributions[] allMargDists; //asset
     
     double[] per;
     
-    public AggregatedResults(){
+    public AggregatedResults(int nTimeSegments){
+        
+        this.nTimeSegments=nTimeSegments;
         
         //percentiles to evaluate
         double[] per0 = {0.01,0.025,0.25,0.50,0.75,0.975,0.99};
@@ -59,6 +63,9 @@ public class AggregatedResults {
         }else{
             timeSegment = extendVectorInt((timeSegment[(timeSegment.length-1)]+1),timeSegment);
         }
+        
+        //store marginal distributions
+        addMargDists(margDists);
         
         //evaluate results for each asset
         for (int assetIdx=0; assetIdx<margDists.length; assetIdx++){
@@ -113,23 +120,23 @@ public class AggregatedResults {
         return(res);
     }
     
-    public String resultsHeader(){
+    public String resultsHeader(String sep){
         
-        String header = "segment,";
+        String header = "segment" + sep;
         
         for (int assetIdx=0; assetIdx<meanOccupancy[0].length; assetIdx++){
-            header += "meanAsset" + assetIdx + ",";
+            header += "meanAsset" + assetIdx + sep;
         }
         for (int assetIdx=0; assetIdx<blockingProbability[0].length; assetIdx++){
-            header += "blockProbAsset" + assetIdx + ",";
+            header += "blockProbAsset" + assetIdx + sep;
         }
         for (int assetIdx=0; assetIdx<capacity[0].length; assetIdx++){
-            header += "capacityAsset" + assetIdx + ",";
+            header += "capacityAsset" + assetIdx + sep;
         }
         for (int assetIdx=0; assetIdx<percentiles[0].length; assetIdx++){
             for (int p=0; p<per.length; p++){
                 
-                header += "percentileAsset" + assetIdx + "_" + String.valueOf(Math.round(per[p]*100)) + ",";
+                header += "percentileAsset" + assetIdx + "_" + String.valueOf(Math.round(per[p]*100)) + sep;
                 
             }
         }
@@ -139,8 +146,42 @@ public class AggregatedResults {
         return(header);
     }
     
+    public String marginalDistsHeader(String sep){
+        
+        String header="occupancy" + sep;
+        String s="";
+        
+        for (int assetIdx=0; assetIdx<allMargDists.length; assetIdx++){
+            
+            for (int tidx=0; tidx<timeSegment.length; tidx++){
+                if (assetIdx<(allMargDists.length-1) || tidx<(timeSegment.length-1)){
+                    s=sep;
+                }else{
+                    s="";
+                }
+                header += ("Asset" + assetIdx + tidx + s);
+            }
+                        
+        }
+        
+        return(header);
+    } 
     
     
+    private void addMargDists(double[][] margDists){
+        
+        if (allMargDists==null){
+            allMargDists = new MarginalDistributions[margDists.length];
+            for (int assetIdx=0; assetIdx<margDists.length; assetIdx++){
+                allMargDists[assetIdx] = new MarginalDistributions(nTimeSegments);
+            }
+        }
+        
+        for (int assetIdx=0; assetIdx<margDists.length; assetIdx++){
+            allMargDists[assetIdx].addMargDist(margDists[assetIdx],timeSegment[(timeSegment.length-1)]);
+        }
+        
+    }
     
     private double meanValue(double[] d){
         
@@ -293,30 +334,81 @@ public class AggregatedResults {
         return(newVec);
     }
     
+    public void writeMarginalDistsToFile(String fileName){
+        
+        String[] stringArray = new String[(getmaxOcc()+1)];
+        
+        String sep = ",";
+        String str,s;
+        stringArray[0] = marginalDistsHeader(sep);
+        for (int i=1; i<stringArray.length; i++){ //loop over occupancies
+            
+            str=Integer.toString(i-1) + sep;
+            for (int assetIdx=0; assetIdx<allMargDists.length; assetIdx++){
+            
+                for (int tidx=0; tidx<timeSegment.length; tidx++){
+                    if (assetIdx<(allMargDists.length-1) || tidx<(timeSegment.length-1)){
+                        s=sep;
+                    }else{
+                        s="";
+                    }
+                    
+                    if (i<=allMargDists[assetIdx].getMargDist(tidx).length){
+                        str += allMargDists[assetIdx].getMargDist(tidx)[(i-1)] + s;
+                    }else{
+                        str += "0.0" + s;
+                    }
+                    
+                }
+                        
+            }
+            
+            stringArray[i]=str;
+            
+        }
+
+        writeStringToFile(fileName,stringArray);
+        
+    }
+    
+    private int getmaxOcc(){
+        
+        int m=Integer.MIN_VALUE;
+        for (int assetIdx=0; assetIdx<allMargDists.length; assetIdx++){
+            for (int tidx=0; tidx<timeSegment.length; tidx++){
+                if (allMargDists[assetIdx].getMargDist(tidx).length>m){
+                    m=allMargDists[assetIdx].getMargDist(tidx).length;
+                }
+            }
+        }
+        
+        return(m);
+    }
     
     
     public void writeResultsToFile(String fileName){
         
         String[] stringArray = new String[(timeSegment.length+1)];
-        stringArray[0] = resultsHeader();
         
+        String sep = ",";
         String str;
+        stringArray[0] = resultsHeader(sep);
         for (int i=1; i<stringArray.length; i++){
             
-            str=String.valueOf(timeSegment[(i-1)]) + ",";
+            str=String.valueOf(timeSegment[(i-1)]) + sep;
             
             for (int assetIdx=0; assetIdx<meanOccupancy[(i-1)].length; assetIdx++){
-                str += String.valueOf(meanOccupancy[(i-1)][assetIdx])+",";
+                str += String.valueOf(meanOccupancy[(i-1)][assetIdx])+sep;
             }
             for (int assetIdx=0; assetIdx<blockingProbability[(i-1)].length; assetIdx++){
-                str += String.valueOf(blockingProbability[(i-1)][assetIdx])+",";
+                str += String.valueOf(blockingProbability[(i-1)][assetIdx])+sep;
             }
             for (int assetIdx=0; assetIdx<capacity[(i-1)].length; assetIdx++){
-                str += String.valueOf((int)capacity[(i-1)][assetIdx])+",";
+                str += String.valueOf((int)capacity[(i-1)][assetIdx])+sep;
             }
             for (int assetIdx=0; assetIdx<percentiles[(i-1)].length; assetIdx++){
                 for (int p=0; p<per.length; p++){
-                    str += String.valueOf(percentiles[(i-1)][assetIdx][p])+",";
+                    str += String.valueOf(percentiles[(i-1)][assetIdx][p])+sep;
                 }
             }
             str+=runtime[(i-1)];

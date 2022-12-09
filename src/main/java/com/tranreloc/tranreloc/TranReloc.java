@@ -31,14 +31,17 @@ public class TranReloc {
         //-----------------------
         String task = getTask(args); //task to be conducted ("evaluate" or "optimize")
         String resDir = getResultsDirectory(args); //directory for results
+        String outType = getOutputType(args); //type of results
         String serLevel = getServiceLevel(args); //get the service level for the optimization procedure
         if (task.equals("none")){
             task = "evaluate"; //default task
         }
         if (resDir.equals("none")){
-            resDir = resDir = "Results/results.csv"; //default directory for results
+            resDir = "Results/results.csv"; //default directory for results
         }
-        
+        if (outType.equals("none")){
+            outType = "measures"; //default output type
+        }
         //service level for the optimization procedure
         double serviceLevel;
         if (serLevel.equals("none")){
@@ -66,7 +69,11 @@ public class TranReloc {
             eval.evaluateSequence(readParam.occupied);
         
             //write results to file
-            eval.writeResultsToFile(resDir);
+            if (outType.equals("measures")){
+                eval.writeResultsToFile(resDir);
+            }else if(outType.equals("distributions")){
+                eval.writeMarginalDistsToFile(resDir);
+            }
     
         }else if(task.equals("optimize")){
                 
@@ -75,7 +82,11 @@ public class TranReloc {
             opt.optimize(serviceLevel,readParam.occupied);
             
             //write results to file
-            opt.writeResultsToFile(resDir);
+            if (outType.equals("measures")){
+                opt.writeResultsToFile(resDir);
+            }else if(outType.equals("distributions")){
+                opt.writeMarginalDistsToFile(resDir);
+            }
         }else{
             System.out.println("Warning. Unknown task: " + task + "\n"
                     + "Terminating program.");
@@ -97,6 +108,20 @@ public class TranReloc {
         }
         
     }
+    
+    public static String getOutputType(String[] inputArgs){
+        
+        int idx=0;
+        while (idx<inputArgs.length && !inputArgs[idx].equals("-o")){
+            idx++;
+        }
+        if (idx==inputArgs.length){
+            return("none");
+        }else{
+            return(inputArgs[(idx+1)]);
+        }
+        
+    }            
 
     public static String getServiceLevel(String[] inputArgs){
         

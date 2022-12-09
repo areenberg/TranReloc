@@ -40,7 +40,7 @@ public class OptimizeSystem {
         newStateDist = null;
         oldStateDist = null;
         
-        res = new AggregatedResults();
+        res = new AggregatedResults(eval.capacity.length);
         
     }
     
@@ -458,6 +458,10 @@ public class OptimizeSystem {
     public void writeResultsToFile(String fileName){    
         res.writeResultsToFile(fileName);
     }
+    
+    public void writeMarginalDistsToFile(String fileName){    
+        res.writeMarginalDistsToFile(fileName);
+    }   
     
     private double[] storeDistribution(double[] dist0){
         

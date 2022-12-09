@@ -41,14 +41,14 @@ public class EvaluateSystem {
     CustomerRelocationMap relMap;
     
     
-    public EvaluateSystem(int nAssets,CustomerRelocationMap relMap){
-        
-        this.nAssets = nAssets;
-        this.relMap = relMap;
-        
-        res = new AggregatedResults();
-        
-    }
+//    public EvaluateSystem(int nAssets,CustomerRelocationMap relMap){
+//        
+//        this.nAssets = nAssets;
+//        this.relMap = relMap;
+//        
+//        res = new AggregatedResults();
+//        
+//    }
     
     public EvaluateSystem(int nAssets, CustomerRelocationMap relMap,
             double[][] arrivalRates, int[][] capacity,
@@ -60,7 +60,7 @@ public class EvaluateSystem {
         this.capacity = capacity;
         this.phDists = phDists;
         
-        res = new AggregatedResults();
+        res = new AggregatedResults(capacity.length);
         
     }
     
@@ -260,7 +260,10 @@ public class EvaluateSystem {
     public void writeResultsToFile(String fileName){    
         res.writeResultsToFile(fileName);
     }
-    
+
+    public void writeMarginalDistsToFile(String fileName){    
+        res.writeMarginalDistsToFile(fileName);
+    }
     
 }
 
