@@ -128,7 +128,7 @@ public class EvaluateSystem {
     }
     
     
-    public StateDistribution evaluateSingleSegment(StateDistribution stateDist, int timeSegment){
+    public StateDistribution evaluateSingleSegment(StateDistribution stateDist, int timeSegment, boolean newCap){
         ///evaluate a single segment using the
         //currently evaluated and stored state
         //distribution.
@@ -161,9 +161,11 @@ public class EvaluateSystem {
 //                }
 //                System.out.println();
 //            }
-            
-            stateDist.newStateSpace(S);
-            
+            if (newCap){
+                stateDist.newStateSpace(S);
+            }else{
+                System.out.println("State space did not change.");
+            }
             
 //            margDist = stateDist.getMarginalStateDists();
         
@@ -202,6 +204,7 @@ public class EvaluateSystem {
         
         double elapsed;
         long startTime;
+        boolean newCap;
         
         System.out.println("-------- SEGMENT " + 0 + " --------");
         
@@ -234,14 +237,19 @@ public class EvaluateSystem {
                 
                 startTime = System.currentTimeMillis();
                 
-                stateDist = evaluateSingleSegment(stateDist,timeSegment);
+                newCap = false;
+                for (int i=0; i<nAssets; i++){
+                    if (capacity[timeSegment][i]!=capacity[(timeSegment-1)][i]){
+                        newCap=true;
+                    }
+                    cap[i]=(double)capacity[timeSegment][i];
+                }
+                
+                stateDist = evaluateSingleSegment(stateDist,timeSegment,newCap);
                 
                 elapsed = (double) (System.currentTimeMillis()-startTime)/1000.0;
                 
                 margDist = stateDist.getMarginalStateDists();
-                for (int i=0; i<nAssets; i++){
-                    cap[i]=(double)capacity[timeSegment][i];
-                }
                 res.addResults(margDist,cap,elapsed);
                 
 //                for (int assetIdx=0; assetIdx<margDist.length; assetIdx++){

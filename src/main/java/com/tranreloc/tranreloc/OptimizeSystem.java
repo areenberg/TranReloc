@@ -101,7 +101,7 @@ public class OptimizeSystem {
                     newStateDist.setStateDistribution(oldStateDist.stateDist); //employ the old state dist.
                     
                     //change from the old to the new state distribution
-                    newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment);
+                    newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment,true);
                 }
                 
                 //calculate the marginal distribution
@@ -240,7 +240,7 @@ public class OptimizeSystem {
                     newStateDist.setStateDistribution(oldStateDist.stateDist); //employ the old state dist.
                     
                     //change from the old to the new state distribution
-                    newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment);
+                    newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment,true);
                 }
                 
                 //calculate the marginal distribution
@@ -298,7 +298,7 @@ public class OptimizeSystem {
                     newStateDist.setStateDistribution(oldStateDist.stateDist); //employ the old state dist.
                     
                     //change from the old to the new state distribution
-                    newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment);
+                    newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment,true);
                 }
                 
                 //calculate the marginal distribution
@@ -378,7 +378,7 @@ public class OptimizeSystem {
                 newStateDist.setStateDistribution(oldStateDist.stateDist); //employ the old state dist.
                     
                 //change from the old to the new state distribution
-                newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment);
+                newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment,true);
             }
                 
             //calculate the marginal distribution
@@ -447,7 +447,7 @@ public class OptimizeSystem {
             newStateDist.setStateDistribution(oldStateDist.stateDist); //employ the old state dist.
                     
             //change from the old to the new state distribution
-            newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment);
+            newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment,true);
         }
         
     }
