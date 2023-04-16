@@ -129,6 +129,68 @@ public class OptimizeSystem {
         
     }
     
+//    public void optimizeMultiple(){
+//        //optimization for multiple assets
+//        //in the system
+//        
+//        capacity = new int[eval.arrivalRates.length][eval.nAssets];
+//        double[] cap = new double[eval.nAssets];
+//        
+//        //current lower and upper capacity bounds
+//        //of each asset
+//        int[][] capBounds;
+//        
+//        double elapsed;
+//        long startTime;
+//        
+//        //optimize each segment
+//        for (int timeSegment=0; timeSegment<capacity.length; timeSegment++){
+//            
+//            System.out.println("#############################################");
+//            System.out.println("         SEGMENT " + timeSegment + "        ");
+//            System.out.println("#############################################");
+//            startTime = System.currentTimeMillis();
+//            
+//            //derive bounds for each asset
+//            System.out.println("Deriving bounds...");
+//            capBounds = deriveBounds(timeSegment);
+//            System.out.println("Done.");
+//            
+//            //derive the optimized capacity and store in
+//            //the capacity array
+//            System.out.println("Optimization using bounds:");
+//            for (int assetIdx=0; assetIdx<eval.nAssets; assetIdx++){
+//                System.out.print("(" + capBounds[assetIdx][1] + "," + capBounds[assetIdx][0] + ") ");
+//            }
+//            System.out.println();
+//            optimizeWithBounds(timeSegment,capBounds);
+//            System.out.println("Done.");
+//            
+//            //store state distribution of optimal capacity allocation
+//            //assuming the capacity array stores the solution
+//            oldStateDist = new StateDistribution();
+//            assets = new Asset[eval.nAssets];
+//            for (int assetIdx=0; assetIdx<eval.nAssets; assetIdx++){
+//                assets[assetIdx] = new Asset(capacity[timeSegment][assetIdx],
+//                    eval.phDists[timeSegment][assetIdx],eval.arrivalRates[timeSegment][assetIdx]);
+//            }
+//            S = new StateSpace(assets,eval.relMap);
+//            oldStateDist.setStateSpace(S);
+//            oldStateDist.setStateDistribution(newStateDist.stateDist);
+//            
+//            
+//            //store results
+//            for (int assetIdx=0; assetIdx<eval.nAssets; assetIdx++){
+//                cap[assetIdx] = (double) capacity[timeSegment][assetIdx];
+//            }
+//            elapsed = (double) (System.currentTimeMillis()-startTime)/1000.0;
+//            res.addResults(oldStateDist.getMarginalStateDists(),cap,elapsed);
+//            
+//        }
+//        
+//        
+//    }
+
     public void optimizeMultiple(){
         //optimization for multiple assets
         //in the system
@@ -153,12 +215,12 @@ public class OptimizeSystem {
             
             //derive bounds for each asset
             System.out.println("Deriving bounds...");
-            capBounds = deriveBounds(timeSegment);
+            capBounds = optimizeBounds(timeSegment);
             System.out.println("Done.");
             
             //derive the optimized capacity and store in
             //the capacity array
-            System.out.println("Optimizing using bounds:");
+            System.out.println("Optimization using bounds:");
             for (int assetIdx=0; assetIdx<eval.nAssets; assetIdx++){
                 System.out.print("(" + capBounds[assetIdx][1] + "," + capBounds[assetIdx][0] + ") ");
             }
@@ -191,6 +253,7 @@ public class OptimizeSystem {
         
     }
     
+    
     public int[][] deriveBounds(int timeSegment){
         //derive the current lower and upper bounds
         //of each asset
@@ -209,6 +272,7 @@ public class OptimizeSystem {
                     capacity[timeSegment][i]=1;
                 }
             }
+            capacity[timeSegment][assetIdx]=0;
             
             do{
                 
@@ -267,6 +331,7 @@ public class OptimizeSystem {
                     capacity[timeSegment][i]=capBounds[i][0];
                 }
             }
+            capacity[timeSegment][assetIdx]=0;
             
             do{
                 
@@ -324,6 +389,113 @@ public class OptimizeSystem {
         return(capBounds);
     }
     
+    private boolean boundsEqual(int[][] capBounds){
+        //check if bounds are equal
+        int assetIdx=0;
+        while (assetIdx<eval.nAssets){
+            if (capBounds[assetIdx][0]!=capBounds[assetIdx][1]){
+                return(false);
+            }
+            assetIdx++;
+        }
+        return(true);
+    }
+
+    public int[][] optimizeBounds(int timeSegment){
+        //derive equal bounds for each asset
+        
+        int[][] capBounds = new int[eval.nAssets][2]; //assets x {upper,lower}
+        for (int assetIdx=0; assetIdx<eval.nAssets; assetIdx++){
+            capBounds[assetIdx][0]=1;
+            capBounds[assetIdx][1]=1;
+        }
+        double[][] margDist;
+        
+        boolean changed;
+        int b0=0;
+        int b1=1;
+        do {
+            
+            changed=false;
+            for (int assetIdx=0; assetIdx<eval.nAssets; assetIdx++){
+            
+                //initialize
+                capacity[timeSegment] = new int[eval.nAssets];
+                for (int i=0; i<eval.nAssets; i++){
+                    if (i!=assetIdx){
+                        capacity[timeSegment][i]=capBounds[i][b1];
+                    }
+                }
+                capacity[timeSegment][assetIdx] = capBounds[assetIdx][1]-1;
+            
+                do{
+                
+                    capacity[timeSegment][assetIdx]++;
+                
+                    System.out.println("Employ capacity");
+                    for (int ii=0; ii<eval.nAssets; ii++){
+                        System.out.print(capacity[timeSegment][ii] + " ");
+                    }
+                    System.out.println();
+                
+                    eval.changeCapacity(capacity); //employ capacity in the system
+                
+                    //evaluate 
+                    if (timeSegment==0){
+                        newStateDist = eval.evaluateSingleSegment(currentOccupation,0);
+                    }else{
+                    
+                        //allocate memory for a new state distribution, assets and state space matching the new capacity
+                        newStateDist = new StateDistribution();
+                        assets = new Asset[eval.nAssets];
+                        for (int i=0; i<eval.nAssets; i++){
+                            assets[i] = new Asset(capacity[(timeSegment-1)][i],
+                                eval.phDists[(timeSegment-1)][i],eval.arrivalRates[(timeSegment-1)][i]);
+                        }
+                        S = new StateSpace(assets,eval.relMap);
+                    
+                        newStateDist.setStateSpace(S); //employ state space in state distribution
+                        newStateDist.setStateDistribution(oldStateDist.stateDist); //employ the old state dist.
+                    
+                        //change from the old to the new state distribution
+                        newStateDist = eval.evaluateSingleSegment(newStateDist,timeSegment,true);
+                    }
+                
+                    //calculate the marginal distribution
+                    margDist = newStateDist.getMarginalStateDists();
+                
+                    System.out.println("Shortage prob: " + margDist[assetIdx][(margDist[assetIdx].length-1)]);
+                
+                }while(margDist[assetIdx][(margDist[assetIdx].length-1)]>(1.0-serviceLevel)); //assess the shortage probability
+            
+                if (capBounds[assetIdx][b0]!=capacity[timeSegment][assetIdx]){
+                    capBounds[assetIdx][b0] = capacity[timeSegment][assetIdx]; //insert bound
+                    changed=true;
+                }
+                //if the fast approx. state dist. change caused the lower bound
+                //to be larger than the upper bound
+                if (capBounds[assetIdx][1]>capBounds[assetIdx][0]){
+                    capBounds[assetIdx][0]=capBounds[assetIdx][1];
+                }
+            
+            }
+           
+            System.out.println("----- Current bounds -----");
+            for (int i=0; i<eval.nAssets; i++){
+                System.out.print("("+capBounds[i][1]+","+capBounds[i][0]+") ");
+            }
+            System.out.println();
+                
+            if (b0==0){
+                b0=1;b1=0;
+            }else{
+                b0=0;b1=1;
+            }
+            
+        } while(!boundsEqual(capBounds) && changed);
+        
+        return(capBounds);
+    }
     
     
     public void optimizeWithBounds(int timeSegment, int[][] capBounds){
