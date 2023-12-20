@@ -1,7 +1,7 @@
 # TranReloc
-TranReloc evaluates queueing systems with customer relocation. Consider the M/PH/c/c queue, i.e. where customers have exponentially distributed inter-arrival time, phase-type distributed service time, and c servers. The capacity of the queue is equal to the number of servers, and customers will be rejected if they arrive when none of the c servers are idle at the time of arrival to the queue. TranReloc extends the M/PH/c/c queue by considering a series of systems that may relocate customers instead completely rejecting them. Moreover, TranReloc gives the user the opportunity to evaluate the system with time-dependent parameters. This type of system reflects customer behavior in the rental industry and patient flow in hospitals.
+TranReloc evaluates queueing systems with customer relocation. Consider the M/PH/c/c queue, i.e. where customers have exponentially distributed inter-arrival time, phase-type distributed service time, and c servers. The capacity of the queue is equal to the number of servers, and customers will be rejected if they arrive when none of the c servers are idle at the time of arrival to the queue. TranReloc extends the M/PH/c/c queue by considering a series of systems that may relocate customers instead completely rejecting them. Moreover, TranReloc gives the user the opportunity to evaluate the system with time-dependent parameters. 
 
-TranReloc is written in Java, and the interface currently consists of a simple CLI and an R-script (see the section *"Implementing your model (using R)"*).
+TranReloc is written in Java, and the interface currently consists of a simple Command Line Interface (CLI). The easiest way to send commands to TranReloc (using the CLI) is through an R-script. The section *"Implement your model using R"* shows how to use R for implementing and evaluating a model.
   
 ## Features
 
@@ -43,13 +43,137 @@ The first service-time distribution (index 0) *always* governs the service-time 
 
 <img src="https://github.com/areenberg/TranReloc/blob/main/Images/Relocation.jpg?raw=true" width="1400" height="450">
 
-
  
-# Implementing your model (using R)
+# Implement your model using R
 
-Coming soon.
+Start by cloning the repository and navigating to the folder called `TranReloc incl R`. Open the template `R_Interface.R`.
+
+### 1. Task and output type
+
+- **`task`**: Define the task as either "optimize" or "evaluate".
+  - Example: 
+    ```R
+    task <- "optimize"
+    ```
+
+- **`output.type`**: Choose between "measures" or "distributions" for the output type.
+  - Example: 
+    ```R
+    output.type <- "distributions"
+    ```
+
+### 2. Assets configuration
+
+- **`nAssets`**: Specify the number of assets.
+  - Example: 
+    ```R
+    nAssets <- 2
+    ```
+
+- **`asset.nms`**: Provide names for each asset, corresponding to `nAssets`.
+  - Example: 
+    ```R
+    asset.nms <- c("asset0", "asset1")
+    ```
+
+### 3. Time periods
+
+- **`timePeriods`**: Define the number of time periods you want to evaluate.
+  - Example: 
+    ```R
+    timePeriods <- 10
+    ```
+
+### 4. Currently occupied capacity
+
+- **`currentOccupied`**: Set the currently occupied capacity for each asset.
+  - Example: 
+    ```R
+    currentOccupied <- c(0, 0)
+    ```
+
+### 5. Distributions per asset
+
+- **`assetDists`**: Specify the number of distributions for each asset.
+  - Example: 
+    ```R
+    assetDists <- c(2, 2)
+    ```
+
+### 6. Capacity and arrival rates
+
+- **`capacity`**: Define the capacity for each asset over time.
+- **`arrivalRate`**: Set the arrival rates for each asset.
+
+### 7. Relocation rules
+
+Relocation rules define how customers are moved between assets under certain conditions.
+
+- **Between assets relocation**
+  - `rule1 <- "betweenAssets,1.0,0,1,{0}"` 
+
+This rule specifies that when asset 0 (`{0}`) is blocked (i.e., reaches its capacity), 100% (`1.0`) of the customers are relocated from asset 0 to asset 1.
+
+- **Distribution within an asset in case of relocation**
+  - `rule4 <- "toDistsInAsset,1,0,{0,1},{0.05,0.95}"`
+
+This rule is more complex. It specifies that customers relocated from asset 1 to asset 0 can be distributed across two different distributions within asset 0 (distributions 0 and 1). The customers are further distributed with a ratio of 5% (`0.05`) to distribution 0 and 95% (`0.95`) to distribution 1.
+
+### Constructing your own relocation rules
+
+- When constructing your own relocation rules, consider the following format:
+  - `"betweenAssets, [relocation_ratio], [source_asset], [destination_asset], {[blocked_assets]}"` for asset-to-asset relocation.
+  - `"toDistsInAsset, [source_asset], [destination_asset], {[dist_indices]}, {[dist_ratios]}"` for distribution-specific relocation within assets.
+
+### 8. Asset distributions
+
+- Specify initial distributions and phase-type generators for each distribution of each asset.
+  - Example for Asset 0, Distribution 0:
+    ```R
+    asset0.dist0.initDist <- c(0.75, 0.25)
+    asset0.dist0.phGen <- matrix(...)
+    ```
+
+### 9. Modifying service time distributions
+
+The *service time distributions* section of the script is responsible for defining and applying service time distributions for each asset across different time periods. Here is how you can modify this section to suit your requirements.
+
+The `serviceTimeDist` function sets up the service time distribution for a specific asset and distribution. It takes the following parameters:
+- `initDist`: The initial distribution of service time.
+- `phGen`: The phase-type generator matrix for service time transitions.
+- `timeIdx`: The index for the time period.
+- `distIdx`: The index for the specific distribution.
+- `assetIdx`: The index for the asset.
+
+Example: 
+```R
+#service time distributions
+for (timeIdx in c(0:(timePeriods-1))){
+  #----- asset 0 distributions -----
+  #distribution 0:
+  serviceTimeDist(asset0.dist0.initDist,asset0.dist0.phGen,timeIdx,0,0)
+  
+  #distribution 1:
+  serviceTimeDist(asset0.dist1.initDist,asset0.dist1.phGen,timeIdx,1,0)
+  
+  #----- asset 1 distributions -----
+  #distribution 0:
+  serviceTimeDist(asset1.dist0.initDist,asset1.dist0.phGen,timeIdx,0,1)
+  
+  #distribution 1:
+  serviceTimeDist(asset1.dist1.initDist,asset1.dist1.phGen,timeIdx,1,1)
+}
+```
 
 
+## Prerequisites
+
+* The package `rlist` is required. Install with `install.packages("rlist")`
+* The template assumes that the script runs in RStudio. If this is **not** the case, simply replace `setwd(dirname(getActiveDocumentContext()$path))` with `setwd("your_workspace_directory"))` and remove the import `library(rstudioapi)`. If this **is** the case, install `rstudioapi` with `install.packages("rstudioapi")`.
+ 
+## Debugging
+
+* If the JAR-file for TranReloc cannot be found, try modifying the line `system(paste("java -jar \"",getwd(),"/TranReloc.jar\""," -t ",task," -o ",output.type,sep=""))` in the bottom of the file.
 
 # How to cite
 
@@ -57,7 +181,7 @@ Andersen, A. R., TranReloc: Relocation of customers in a transient queueing syst
 
 # License
 
-Copyright 2022 Anders Reenberg Andersen.
+Copyright 2023 Anders Reenberg Andersen.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
