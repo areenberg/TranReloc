@@ -167,11 +167,11 @@ for (timeIdx in c(0:(timePeriods-1))){
 ## Prerequisites
 
 * The package `rlist` is required. Install with `install.packages("rlist")`.
-* The template assumes that the script runs in RStudio. If this is **not** the case, simply replace `setwd(dirname(getActiveDocumentContext()$path))` with `setwd("your_workspace_directory"))` and remove the import `library(rstudioapi)`. If this **is** the case, install `rstudioapi` with `install.packages("rstudioapi")`.
- 
+* The template assumes that the script runs in RStudio. If this is **not** the case, simply replace `setwd(dirname(getActiveDocumentContext()$path))` with `setwd("your_workspace_directory")` and remove the import `library(rstudioapi)`. If this **is** the case, install package `rstudioapi` with `install.packages("rstudioapi")`.
+
 ## Debugging
 
-* If the JAR-file for TranReloc cannot be found, try modifying the line `system(paste("java -jar \"",getwd(),"/TranReloc.jar\""," -t ",task," -o ",output.type,sep=""))` in the bottom of the file.
+* If the JAR-file for TranReloc cannot be found, try modifying the line `system(paste("java -jar \"",getwd(),"/TranReloc.jar\""," -t ",task," -o ",output.type,sep=""))` in the bottom of the template.
 
 # How to cite
 
