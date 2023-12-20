@@ -111,13 +111,11 @@ Relocation rules define how customers are moved between assets under certain con
 
 - **Between assets relocation**
   - `rule1 <- "betweenAssets,1.0,0,1,{0}"` 
-
-This rule specifies that when asset 0 (`{0}`) is blocked (i.e., reaches its capacity), 100% (`1.0`) of the customers are relocated from asset 0 to asset 1.
+  - This rule specifies that when asset 0 (`{0}`) is blocked (i.e., reaches its capacity), 100% (`1.0`) of the customers are relocated from asset 0 to asset 1.
 
 - **Distribution within an asset in case of relocation**
   - `rule4 <- "toDistsInAsset,1,0,{0,1},{0.05,0.95}"`
-
-This rule is more complex. It specifies that customers relocated from asset 1 to asset 0 can be distributed across two different distributions within asset 0 (distributions 0 and 1). The customers are further distributed with a ratio of 5% (`0.05`) to distribution 0 and 95% (`0.95`) to distribution 1.
+  - This rule is more complex. It specifies that customers relocated from asset 1 to asset 0 can be distributed across two different distributions within asset 0 (distributions 0 and 1). The customers are further distributed with a ratio of 5% (`0.05`) to distribution 0 and 95% (`0.95`) to distribution 1.
 
 ### Constructing your own relocation rules
 
@@ -168,7 +166,7 @@ for (timeIdx in c(0:(timePeriods-1))){
 
 ## Prerequisites
 
-* The package `rlist` is required. Install with `install.packages("rlist")`
+* The package `rlist` is required. Install with `install.packages("rlist")`.
 * The template assumes that the script runs in RStudio. If this is **not** the case, simply replace `setwd(dirname(getActiveDocumentContext()$path))` with `setwd("your_workspace_directory"))` and remove the import `library(rstudioapi)`. If this **is** the case, install `rstudioapi` with `install.packages("rstudioapi")`.
  
 ## Debugging
